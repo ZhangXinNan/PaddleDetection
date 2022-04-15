@@ -17,6 +17,16 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import os
+from PIL import ImageFont
+__dir__ = os.path.abspath(os.path.dirname(__file__))
+font_file = os.path.join(__dir__, '../../docs/simfang.ttf')
+if os.path.isfile(font_file):
+    font = ImageFont.truetype(font_file)
+else:
+    font = None
+
+
 import numpy as np
 from PIL import Image, ImageDraw
 import cv2
@@ -121,10 +131,16 @@ def draw_bbox(image, im_id, catid2name, bboxes, threshold):
 
         # draw label
         text = "{} {:.2f}".format(catid2name[catid], score)
-        tw, th = draw.textsize(text)
+        if font:
+            tw, th = draw.textsize(text, font=font)
+        else:
+            tw, th = draw.textsize(text)
         draw.rectangle(
             [(xmin + 1, ymin - th), (xmin + tw + 1, ymin)], fill=color)
-        draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
+        if font:
+            draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255), font=font)
+        else:
+            draw.text((xmin + 1, ymin - th), text, fill=(255, 255, 255))
 
     return image
 
